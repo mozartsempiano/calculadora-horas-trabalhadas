@@ -415,10 +415,10 @@
         rounding:'threshold10', 
         workSchedule:'5x2', 
         cycleStartDay: 25,
-        standardEntry: '8h00',
-        standardLunchOut: '12h00',
-        standardLunchIn: '13h00',
-        standardExit: '17h45'
+        standardEntry: '08:00',
+        standardLunchOut: '12:00',
+        standardLunchIn: '13:00',
+        standardExit: '17:45'
       }
     };
 
@@ -1469,12 +1469,64 @@
     document.getElementById('fileInput').addEventListener('change', (ev)=>{
       const f = ev.target.files[0]; if(!f) return;
       const reader = new FileReader(); reader.onload = ()=>{
-        try{const obj = JSON.parse(reader.result); if(obj.data){ state.data = obj.data; } if(obj.settings){ state.settings = {...state.settings, ...obj.settings}; }
-          // update UI
-          contractInput.value = state.settings.contractHours;
-          roundingSel.value = state.settings.rounding;
+        try{
+          const obj = JSON.parse(reader.result);
+          
+          // Validate file structure
+          if(!obj || typeof obj !== 'object') {
+            throw new Error('Estrutura de arquivo inválida');
+          }
+          
+          // Import data if present
+          if(obj.data && typeof obj.data === 'object'){ 
+            state.data = obj.data; 
+            console.log('Dados de horas importados:', Object.keys(obj.data).length, 'meses');
+          } 
+          
+          // Import settings if present
+          if(obj.settings && typeof obj.settings === 'object'){ 
+            // Merge settings, keeping defaults for missing values
+            state.settings = {...state.settings, ...obj.settings}; 
+            
+            // Update UI elements with imported settings
+            document.getElementById('rounding').value = state.settings.rounding || 'threshold10';
+            document.getElementById('workSchedule').value = state.settings.workSchedule || '5x2';
+            document.getElementById('cycleStartDay').value = state.settings.cycleStartDay || 25;
+            
+            // Update standard times - handle both old format (8h00) and new format (08:00)
+            const entry = state.settings.standardEntry || '08:00';
+            const lunchOut = state.settings.standardLunchOut || '12:00';
+            const lunchIn = state.settings.standardLunchIn || '13:00';
+            const exit = state.settings.standardExit || '17:45';
+            
+            // Convert old format to new format if needed
+            document.getElementById('standardEntry').value = entry.includes('h') ? entry.replace('h', ':').padStart(5, '0') : entry;
+            document.getElementById('standardLunchOut').value = lunchOut.includes('h') ? lunchOut.replace('h', ':').padStart(5, '0') : lunchOut;
+            document.getElementById('standardLunchIn').value = lunchIn.includes('h') ? lunchIn.replace('h', ':').padStart(5, '0') : lunchIn;
+            document.getElementById('standardExit').value = exit.includes('h') ? exit.replace('h', ':').padStart(5, '0') : exit;
+            
+            // Update settings with correct format
+            state.settings.standardEntry = document.getElementById('standardEntry').value;
+            state.settings.standardLunchOut = document.getElementById('standardLunchOut').value;
+            state.settings.standardLunchIn = document.getElementById('standardLunchIn').value;
+            state.settings.standardExit = document.getElementById('standardExit').value;
+            
+            // Recalculate contract hours based on imported standard times
+            calculateContractHours();
+            console.log('Configurações importadas:', state.settings);
+          }
+          
+          // Save to localStorage
+          saveStorage();
+          
+          // Re-render calendar with imported data
           renderCalendar();
-        }catch(e){ alert('Arquivo JSON inválido'); }
+          
+          alert('Dados importados com sucesso!');
+        }catch(e){ 
+          console.error('Erro ao importar JSON:', e);
+          alert(`Erro ao importar arquivo: ${e.message}\n\nVerifique se o arquivo foi exportado pela própria calculadora.`); 
+        }
       }; reader.readAsText(f);
     });
 
