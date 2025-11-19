@@ -1,0 +1,298 @@
+{
+  "dados": {
+    "2025-11": {
+      "2025-11-03": {
+        "entrada": "07:31",
+        "saidaAlmoco": "11:58",
+        "voltaAlmoco": "13:02",
+        "saida": "18:30",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-07": {
+        "entrada": "",
+        "saidaAlmoco": "",
+        "voltaAlmoco": "",
+        "saida": "",
+        "observacao": "",
+        "isFolga": true,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-20": {
+        "entrada": "",
+        "saidaAlmoco": "",
+        "voltaAlmoco": "",
+        "saida": "",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-05": {
+        "entrada": "07:32",
+        "saidaAlmoco": "11:59",
+        "voltaAlmoco": "13:01",
+        "saida": "18:30",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-04": {
+        "entrada": "07:32",
+        "saidaAlmoco": "12:00",
+        "voltaAlmoco": "13:01",
+        "saida": "17:40",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-06": {
+        "entrada": "07:49",
+        "saidaAlmoco": "11:59",
+        "voltaAlmoco": "12:59",
+        "saida": "17:48",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-10": {
+        "entrada": "07:35",
+        "saidaAlmoco": "11:59",
+        "voltaAlmoco": "12:58",
+        "saida": "18:31",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-11": {
+        "entrada": "07:42",
+        "saidaAlmoco": "11:59",
+        "voltaAlmoco": "12:59",
+        "saida": "17:45",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-12": {
+        "entrada": "07:44",
+        "saidaAlmoco": "11:59",
+        "voltaAlmoco": "12:59",
+        "saida": "18:31",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-08": {
+        "entrada": "",
+        "saidaAlmoco": "",
+        "voltaAlmoco": "",
+        "saida": "",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-13": {
+        "entrada": "07:44",
+        "saidaAlmoco": "12:01",
+        "voltaAlmoco": "13:02",
+        "saida": "17:44",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-14": {
+        "entrada": "07:44",
+        "saidaAlmoco": "12:00",
+        "voltaAlmoco": "13:00",
+        "saida": "17:45",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-17": {
+        "entrada": "08:00",
+        "saidaAlmoco": "12:00",
+        "voltaAlmoco": "13:00",
+        "saida": "17:45",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-11-18": {
+        "entrada": "07:42",
+        "saidaAlmoco": "12:00",
+        "voltaAlmoco": "13:02",
+        "saida": "18:30",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": null,
+        "fimAtestado": null
+      }
+    },
+    "2025-10": {
+      "2025-10-27": {
+        "entrada": "07:56",
+        "saidaAlmoco": "11:58",
+        "voltaAlmoco": "12:58",
+        "saida": "17:43",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-10-28": {
+        "entrada": "07:53",
+        "saidaAlmoco": "11:59",
+        "voltaAlmoco": "13:01",
+        "saida": "17:44",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-10-29": {
+        "entrada": "07:51",
+        "saidaAlmoco": "12:00",
+        "voltaAlmoco": "13:25",
+        "saida": "17:43",
+        "observacao": "médico",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": true,
+        "inicioAtestado": "12:30",
+        "fimAtestado": "13:30"
+      },
+      "2025-10-30": {
+        "entrada": "07:43",
+        "saidaAlmoco": "12:02",
+        "voltaAlmoco": "13:02",
+        "saida": "17:45",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-10-31": {
+        "entrada": "07:49",
+        "saidaAlmoco": "11:59",
+        "voltaAlmoco": "13:01",
+        "saida": "17:43",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": false,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      }
+    },
+    "2025-12": {
+      "2025-12-26": {
+        "entrada": "",
+        "saidaAlmoco": "",
+        "voltaAlmoco": "",
+        "saida": "",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": true,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2025-12-25": {
+        "entrada": "",
+        "saidaAlmoco": "",
+        "voltaAlmoco": "",
+        "saida": "",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": true,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      }
+    },
+    "2026-01": {
+      "2026-01-02": {
+        "entrada": "",
+        "saidaAlmoco": "",
+        "voltaAlmoco": "",
+        "saida": "",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": true,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      },
+      "2026-01-01": {
+        "entrada": "",
+        "saidaAlmoco": "",
+        "voltaAlmoco": "",
+        "saida": "",
+        "observacao": "",
+        "isFolga": false,
+        "isFeriado": true,
+        "isAtestado": false,
+        "inicioAtestado": "",
+        "fimAtestado": ""
+      }
+    }
+  },
+  "configuracoes": {
+    "horasContrato": "8h45",
+    "arredondamento": "threshold10",
+    "escalaTrabalho": "5x2",
+    "diaInicioCiclo": 25,
+    "entradaPadrao": "08:00",
+    "saidaAlmocoPadrao": "12:00",
+    "voltaAlmocoPadrao": "13:00",
+    "saidaPadrao": "17:45"
+  }
+}
