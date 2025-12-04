@@ -1,191 +1,335 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Calculadora de Horas Trabalhadas</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>Calculadora de Horas Trabalhadas</h1>
-      <br>
-      <div class="controls">
-        <div class="card">
-          <div style="display:flex;flex-direction:column;gap:6px;width:100%;">
-            <label style="font-size:0.875em;font-weight:500;">Horário padrão de trabalho:</label>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-              <input id="standardEntry" type="time" value="08:00" style="width:65px" title="Entrada">
-              <span style="font-size:0.75em;color:#666;">→</span>
-              <input id="standardLunchOut" type="time" value="12:00" style="width:65px" title="Saída almoço">
-              <span style="font-size:0.75em;color:#666;">→</span>
-              <input id="standardLunchIn" type="time" value="13:00" style="width:65px" title="Volta almoço">
-              <span style="font-size:0.75em;color:#666;">→</span>
-              <input id="standardExit" type="time" value="17:45" style="width:65px" title="Saída">
-            </div>
-            <div style="font-size:0.75em;color:#666;text-align:center;">
-              Horas/dia: <span id="calculatedHours" style="font-weight:500;">8h45</span>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <label for="workSchedule" style="font-size:0.875em;font-weight:500;">Escala semanal</label>
-          <select id="workSchedule" style="width:80px;margin-top:4px;">
-            <option value="5x2">5x2</option>
-            <option value="6x1">6x1</option>
-            <option value="3x4">3x4</option>
-            <option value="4x3">4x3</option>
-          </select>
-        </div>
-        <div class="card">
-          <label for="cycleStartDay" style="font-size:0.875em;font-weight:500;">Dia de início do ciclo</label>
-          <input id="cycleStartDay" type="number" min="1" max="31" value="25" style="width:60px;margin-top:4px;">
-        </div>
-        <div class="card">
-          <label for="rounding" style="font-size:0.875em;font-weight:500;">Arredondamento</label>
-          <select id="rounding" style="margin-top:4px;min-width:140px;width:fit-content;max-width:240px">
-            <option value="threshold10" selected>Ajuste CLT automático</option>
-            <option value="nearest5">Arredondar para 5 min</option>
-            <option value="nearest10">Arredondar para 10 min</option>
-            <option value="nearest15">Arredondar para 15 min</option>
-            <option value="none">Nenhum</option>
-          </select>
-        </div>
-      </div>
-    </header>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Calculadora de Horas Trabalhadas</title>
 
-    <main class="calendar">
-      <section class="card month">
-        <div class="month-header">
-          <div style="display:flex;gap:16px;align-items:center">
-            <button id="prevMonth" class="nav-btn">◀</button>
-            <div id="monthLabel" style="font-weight:600"></div>
-            <button id="nextMonth" class="nav-btn">▶</button>
-          </div>
-          <div class="small">Clique em um dia para adicionar/editar horas</div>
-        </div>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="assets/css/style.css" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Calculadora de Horas Trabalhadas</h1>
+				<div class="controls">
+					<div class="card">
+						<div>
+							<div class="standard-hours-wrapper">
+								<label>Horário padrão de trabalho:</label>
+								<div class="time-inputs-row">
+									<input
+										id="standardEntry"
+										type="time"
+										value="08:00"
+										title="Entrada"
+									/>
+									<span class="arrow">→</span>
+									<input
+										id="standardLunchOut"
+										type="time"
+										value="12:00"
+										title="Saída almoço"
+									/>
+									<span class="arrow">→</span>
+									<input
+										id="standardLunchIn"
+										type="time"
+										value="13:00"
+										title="Volta almoço"
+									/>
+									<span class="arrow">→</span>
+									<input
+										id="standardExit"
+										type="time"
+										value="17:45"
+										title="Saída"
+									/>
+								</div>
+								<div class="hours-summary">
+									Horas/dia:
+									<span id="calculatedHours">8h45</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="controls-dois">
+						<div class="card">
+							<label for="workSchedule">Escala semanal</label>
+							<select id="workSchedule">
+								<option value="5x2">5x2</option>
+								<option value="6x1">6x1</option>
+								<option value="3x4">3x4</option>
+								<option value="4x3">4x3</option>
+							</select>
+						</div>
+						<div class="card">
+							<label for="cycleStartDay">Dia de início do ciclo</label>
+							<input
+								id="cycleStartDay"
+								type="number"
+								min="1"
+								max="31"
+								value="25"
+								style="width: 60px; margin-top: 4px"
+							/>
+						</div>
+						<div class="card">
+							<label for="rounding">Arredondamento</label>
+							<select
+								id="rounding"
+								style="
+									margin-top: 4px;
+									min-width: 140px;
+									width: fit-content;
+									max-width: 240px;
+								"
+							>
+								<option value="threshold10" selected>
+									Ajuste CLT automático
+								</option>
+								<option value="nearest5">Arredondar para 5 min</option>
+								<option value="nearest10">Arredondar para 10 min</option>
+								<option value="nearest15">Arredondar para 15 min</option>
+								<option value="none">Nenhum</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</header>
 
-        <div class="weekdays">
-          <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
-        </div>
-        <div id="days" class="days"></div>
-      </section>
+			<main class="calendar">
+				<section class="card month">
+					<div class="month-header">
+						<div class="month-header-nav">
+							<button id="prevMonth" class="nav-btn" aria-label="Mês anterior">
+								<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+									<path
+										d="M13 16l-5-6 5-6"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
+							<div id="monthLabel"></div>
+							<button id="nextMonth" class="nav-btn" aria-label="Próximo mês">
+								<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+									<path
+										d="M7 4l5 6-5 6"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
+						</div>
+						<div class="small">
+							Clique em um dia para adicionar/editar horas
+						</div>
+					</div>
 
-      <aside class="sidebar">
-        <div class="card">
-          <h3>Resumo do período</h3>
-          <div class="totals">
-            <div class="line"><span>Dias úteis (escala)</span><strong id="workDaysTotal">0</strong></div>
-            <div class="line"><span>Horas previstas (contrato)</span><strong id="expectedTotal">0h00</strong></div>
-            <div class="line"><span>Horas trabalhadas</span><strong id="workedTotal">0h00</strong></div>
-            <div class="line"><span>Saldo (sobre/baixo)</span><strong id="balance">0h00</strong></div>
-            <div class="line"><span>Horas/dia restantes</span><strong id="dailyNeeded">0h00</strong></div>
-          </div>
-        </div>
+					<div class="weekdays">
+						<div>Dom</div>
+						<div>Seg</div>
+						<div>Ter</div>
+						<div>Qua</div>
+						<div>Qui</div>
+						<div>Sex</div>
+						<div>Sáb</div>
+					</div>
+					<div id="days" class="days"></div>
+				</section>
 
-        <div class="card">
-          <h3>Legenda</h3>
-          <div class="small">
-            <strong>Ajuste CLT automático:</strong> Diferenças de até 10 minutos em relação às horas contratuais (tanto para mais quanto para menos) são ajustadas para o valor contratual. Acima de 10 min, conta o tempo real trabalhado.<br><br>
-            <strong>Escala semanal:</strong> 5x2 = 5 dias trabalho + 2 folga; 6x1 = 6 trabalho + 1 folga; etc.<br><br>
-            <strong>Dia de início do ciclo:</strong> Define quando seu período de trabalho começa/termina (ex: dia 25 = do dia 25 ao dia 24 do próximo mês).
-          </div>
-        </div>
+				<aside class="sidebar">
+					<div class="card">
+						<h3>Resumo do período</h3>
+						<div class="totals">
+							<div class="line">
+								<span>Dias úteis (escala)</span
+								><strong id="workDaysTotal">0</strong>
+							</div>
+							<div class="line">
+								<span>Horas previstas (contrato)</span
+								><strong id="expectedTotal">0h00</strong>
+							</div>
+							<div class="line">
+								<span>Horas trabalhadas</span
+								><strong id="workedTotal">0h00</strong>
+							</div>
+							<div class="line">
+								<span>Saldo (sobre/baixo)</span
+								><strong id="balance">0h00</strong>
+							</div>
+							<div class="line">
+								<span>Horas/dia restantes</span
+								><strong id="dailyNeeded">0h00</strong>
+							</div>
+						</div>
+					</div>
 
-        <div class="card" id="dadosBotoes">
-          <div id="exportBtns">
-            <button id="exportJson" class="export-btn">Exportar</button>
-            <button id="importJson" class="export-btn">Importar</button>
-          </div>
-          <button id="clearData" class="ghost">Limpar dados deste navegador</button>
-          <input id="fileInput" type="file" accept="application/json" style="display:none">
-        </div>
-      </aside>
-    </main>
+					<div class="card">
+						<h3>Legenda</h3>
+						<div class="small">
+							<strong>Ajuste CLT automático:</strong> Diferenças de até 10
+							minutos em relação às horas contratuais (tanto para mais quanto
+							para menos) são ajustadas para o valor contratual. Acima de 10
+							min, conta o tempo real trabalhado.<br /><br />
+							<strong>Escala semanal:</strong> 5x2 = 5 dias trabalho + 2 folga;
+							6x1 = 6 trabalho + 1 folga; etc.<br /><br />
+							<strong>Dia de início do ciclo:</strong> Define quando seu período
+							de trabalho começa/termina (ex: dia 25 = do dia 25 ao dia 24 do
+							próximo mês).
+						</div>
+					</div>
 
-    <footer>
-      <div style="display:flex;flex-direction: row;justify-content: space-between;align-items: center;width:100%">
-        <div>Dados salvos localmente no navegador. Você pode exportar um backup em JSON.</div>
-        <div class="theme-selector">
-          <label for="themeSelect">Tema:</label>
-          <select id="themeSelect">
-            <option value="light">Claro</option>
-            <option value="dark">Escuro</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction: row;justify-content: left;align-items: center;width:100%;margin-top:6px;">
-        <a href="https://github.com/mozartsempiano/calculadora-horas-trabalhadas/">GitHub</a>
-      </div>
-    </footer>
-  </div>
+					<div class="card" id="dadosBotoes">
+						<div id="exportBtns">
+							<button id="exportJson" class="export-btn">Exportar</button>
+							<button id="importJson" class="export-btn">Importar</button>
+						</div>
+						<button id="clearData" class="ghost">
+							Limpar dados deste navegador
+						</button>
+						<input id="fileInput" type="file" accept="application/json" />
+					</div>
+				</aside>
+			</main>
 
-  <!-- modal -->
-  <div id="modal" style="display:none" class="modal-backdrop">
-    <div class="modal card">
-      <h2 id="modalTitle">Editar dia</h2>
-      <div class="form-grid">
-        <div class="time-fields-container">
-          <div>
-            <label>Chegada</label>
-            <input id="inTime" type="time">
-          </div>
-          <div>
-            <label>Saída p/ almoço</label>
-            <input id="outLunch" type="time">
-          </div>
-          <div>
-            <label>Retorno do almoço</label>
-            <input id="inLunch" type="time">
-          </div>
-          <div>
-            <label>Saída</label>
-            <input id="outTime" type="time">
-          </div>
-        </div>
-        <div style="grid-column:1/3">
-          <label>Observação</label>
-          <input id="note" type="text" placeholder="ex: plantão, 1/2 expediente...">
-        </div>
-        <div style="grid-column:1/3">
-          <label style="display: flex; align-items: center; gap: 8px;">
-            <input id="isHoliday" type="checkbox"> Folga (precisa repor)
-          </label>
-        </div>
-        <div style="grid-column:1/3">
-          <label style="display: flex; align-items: center; gap: 8px;">
-            <input id="isDayOff" type="checkbox"> Feriado (não precisa repor)
-          </label>
-        </div>
-        <div style="grid-column:1/3">
-          <label style="display: flex; align-items: center; gap: 8px;">
-            <input id="modalIsSickLeave" type="checkbox"> Atestado Médico
-          </label>
-        </div>
-        <div id="sick-leave-time" style="grid-column:1/3; display:none;">
-          <label>Horas do Atestado (início - fim)</label>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <input id="modalSickLeaveStart" type="time" style="flex:1;">
-            <span>até</span>
-            <input id="modalSickLeaveEnd" type="time" style="flex:1;">
-          </div>
-        </div>
-      </div>
-      <div class="actions">
-        <button id="deleteDay" class="ghost">Remover</button>
-        <button id="cancelModal" class="ghost">Fechar</button>
-        <button id="saveDay" class="primary">Salvar</button>
-      </div>
-    </div>
-  </div>
+			<footer>
+				<div class="footer-top">
+					<div>
+						Dados salvos localmente no navegador. Você pode exportar um backup
+						em JSON.
+					</div>
+					<div class="theme-selector">
+						<label for="themeSelect">Tema:</label>
+						<select id="themeSelect">
+							<option value="light">Claro</option>
+							<option value="dark">Escuro</option>
+						</select>
+					</div>
+				</div>
+				<div class="footer-bottom">
+					<a
+						href="https://github.com/mozartsempiano/calculadora-horas-trabalhadas/"
+						>GitHub</a
+					>
+				</div>
+			</footer>
+		</div>
 
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/calendar.js"></script>
-  <script src="assets/js/app.js"></script>
-</body>
+		<!-- modal -->
+		<div id="modal" class="modal-backdrop">
+			<div class="modal card">
+				<div class="modal-header">
+					<h2 id="modalTitle">Editar dia</h2>
+					<button id="closeModal" class="close-btn" aria-label="Fechar">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							xml:space="preserve"
+							baseProfile="full"
+							viewBox="0 0 76 76"
+						>
+							<path
+								d="M26.917 22.167 38 33.25l11.083-11.083 4.75 4.75L42.75 38l11.083 11.083-4.75 4.75L38 42.75 26.917 53.833l-4.75-4.75L33.25 38 22.167 26.917l4.75-4.75Z"
+							/>
+						</svg>
+					</button>
+				</div>
+				<div class="form-grid">
+					<div class="fields-wrapper">
+						<label for="inTime">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								xml:space="preserve"
+								baseProfile="full"
+								viewBox="0 0 76 76"
+							>
+								<path
+									d="M38 23.75c8.745 0 15.833 7.089 15.833 15.833 0 8.745-7.088 15.834-15.833 15.834-8.744 0-15.833-7.09-15.833-15.834S29.255 23.75 38 23.75Zm0 3.958c-6.558 0-11.875 5.317-11.875 11.875 0 6.559 5.317 11.875 11.875 11.875s11.875-5.316 11.875-11.875c0-6.558-5.317-11.875-11.875-11.875Zm-.396 3.167c.875 0 1.584.709 1.584 1.583v5.938h5.937c.874 0 1.583.709 1.583 1.583v.792c0 .874-.709 1.583-1.583 1.583H38c-.792-.132-1.583-.264-2.045-.725-.462-.462-.594-1.254-.726-2.046v-7.125c0-.874.709-1.583 1.584-1.583h.791Zm11.48-10.292A6.333 6.333 0 0 1 54.007 30.9a18.272 18.272 0 0 0-9.525-8.336 6.315 6.315 0 0 1 4.6-1.98Zm-22.167 0c1.811 0 3.445.76 4.6 1.98a18.272 18.272 0 0 0-9.525 8.336 6.333 6.333 0 0 1 4.925-10.316Z"
+								/>
+							</svg>
+						</label>
+						<div class="time-fields-container">
+							<div>
+								<input id="inTime" type="time" />
+							</div>
+							<div>
+								<input id="outLunch" type="time" />
+							</div>
+							<div>
+								<input id="inLunch" type="time" />
+							</div>
+							<div>
+								<input id="outTime" type="time" />
+							</div>
+						</div>
+					</div>
+					<div class="fields-wrapper">
+						<label for="note">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								xml:space="preserve"
+								baseProfile="full"
+								viewBox="0 0 76 76"
+							>
+								<path
+									d="M23.75 19h30.083v38H23.75v-1.583c-1.749 0-3.167-1.064-3.167-2.375 0-.609.305-1.163.807-1.584-.502-.42-.807-.975-.807-1.583s.305-1.163.807-1.583c-.502-.42-.807-.975-.807-1.584 0-.608.305-1.163.807-1.583-.502-.42-.807-.975-.807-1.583 0-.609.305-1.163.807-1.584-.502-.42-.807-.975-.807-1.583s.305-1.163.807-1.583c-.502-.42-.807-.975-.807-1.584 0-.608.305-1.163.807-1.583-.502-.42-.807-.975-.807-1.583 0-.609.305-1.163.807-1.584-.502-.42-.807-.975-.807-1.583s.305-1.163.807-1.583c-.502-.42-.807-.975-.807-1.584 0-.608.305-1.163.807-1.583-.502-.42-.807-.975-.807-1.583 0-1.312 1.418-2.375 3.167-2.375V19Zm0 4.75c-.875 0-1.583.355-1.583.792 0 .437.708.791 1.583.791.874 0 1.583-.354 1.583-.791 0-.438-.709-.792-1.583-.792Zm0 3.167c-.875 0-1.583.354-1.583.791 0 .438.708.792 1.583.792.874 0 1.583-.354 1.583-.792 0-.437-.709-.791-1.583-.791Zm0 3.166c-.875 0-1.583.355-1.583.792 0 .437.708.792 1.583.792.874 0 1.583-.355 1.583-.792 0-.437-.709-.792-1.583-.792Zm0 3.167c-.875 0-1.583.355-1.583.792 0 .437.708.791 1.583.791.874 0 1.583-.354 1.583-.791 0-.438-.709-.792-1.583-.792Zm0 3.167c-.875 0-1.583.354-1.583.791 0 .438.708.792 1.583.792.874 0 1.583-.354 1.583-.792 0-.437-.709-.791-1.583-.791Zm0 3.166c-.875 0-1.583.355-1.583.792 0 .437.708.792 1.583.792.874 0 1.583-.355 1.583-.792 0-.437-.709-.792-1.583-.792Zm0 3.167c-.875 0-1.583.355-1.583.792 0 .437.708.791 1.583.791.874 0 1.583-.354 1.583-.791 0-.438-.709-.792-1.583-.792Zm0 3.167c-.875 0-1.583.354-1.583.791 0 .438.708.792 1.583.792.874 0 1.583-.354 1.583-.792 0-.437-.709-.791-1.583-.791Zm0 3.166c-.875 0-1.583.355-1.583.792 0 .437.708.792 1.583.792.874 0 1.583-.355 1.583-.792 0-.437-.709-.792-1.583-.792Zm0 3.167c-.875 0-1.583.355-1.583.792 0 .437.708.791 1.583.791.874 0 1.583-.354 1.583-.791 0-.438-.709-.792-1.583-.792Zm6.333-26.917V28.5H47.5v-3.167H30.083Zm3.167 6.334v1.583h11.083v-1.583H33.25Z"
+								/>
+							</svg>
+						</label>
+						<textarea
+							id="note"
+							placeholder="Adicionar observação..."
+						></textarea>
+					</div>
+					<div>
+						<label class="checkbox-label">
+							<input id="isHoliday" type="checkbox" /> Folga (precisa repor)
+						</label>
+					</div>
+					<div>
+						<label class="checkbox-label">
+							<input id="isDayOff" type="checkbox" /> Feriado (não precisa
+							repor)
+						</label>
+					</div>
+					<div>
+						<label class="checkbox-label">
+							<input id="modalIsSickLeave" type="checkbox" /> Atestado médico
+						</label>
+					</div>
+					<div id="sick-leave-time" class="fields-wrapper">
+						<label>Horas do Atestado (início - fim)</label>
+						<div class="fields-container">
+							<input id="modalSickLeaveStart" type="time" />
+							<span>até</span>
+							<input id="modalSickLeaveEnd" type="time" />
+						</div>
+					</div>
+				</div>
+				<div class="actions">
+					<button id="cancelModal" class="ghost">Cancelar</button>
+					<div class="actions-right">
+						<button id="deleteDay" class="ghost">Excluir</button>
+						<button id="saveDay" class="primary">Salvar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="assets/js/utils.js"></script>
+		<script src="assets/js/calendar.js"></script>
+		<script src="assets/js/app.js"></script>
+	</body>
 </html>
