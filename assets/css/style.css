@@ -1,9 +1,37 @@
 :root {
 	--bg: #f8fafc;
 	--card: #fff;
+	--text: #0b1220;
 	--muted: #64748b;
+	--muted-light: #666;
 	--accent: #3b82f6;
 	--accent-2: #2563eb;
+
+	/* Borders */
+	--border: #e5e7eb;
+
+	/* Buttons */
+	--button-bg: #eef2f6;
+
+	/* States */
+	--danger: #f5385a;
+	--danger-border: #dc2626;
+
+	/* Calendar states - Light */
+	--holiday-bg: #fef2f2;
+	--holiday-border: #fecaca;
+	--personal-bg: #fffbeb;
+	--personal-border: #fde68a;
+	--sick-bg: #fef3c7;
+	--deficit-bg: #fef2f2;
+	--deficit-border: #f87171;
+	--overtime-bg: #f0fdf4;
+	--overtime-border: #22c55e;
+
+	/* Overlays */
+	--overlay: rgba(6, 8, 12, 0.45);
+	--hover-overlay: rgba(0, 0, 0, 0.05);
+	--shadow: rgba(7, 10, 17, 0.06);
 }
 
 * {
@@ -11,9 +39,9 @@
 }
 
 body {
-	font-family: "Outfit", system-ui, Segoe UI, Roboto, Arial, sans-serif;
+	font-family: "Roboto", system-ui, Segoe UI, Roboto, Arial, sans-serif;
 	background: var(--bg);
-	color: #0b1220;
+	color: var(--text);
 	margin: 0;
 	padding: 24px;
 	line-height: 1.5;
@@ -66,7 +94,7 @@ label {
 	gap: inherit;
 	background: var(--card);
 	border-radius: 10px;
-	box-shadow: 0 6px 18px rgba(7, 10, 17, 0.06);
+	box-shadow: 0 6px 18px var(--shadow);
 	padding: 0.75em 1em;
 }
 
@@ -76,7 +104,7 @@ button {
 	align-items: center;
 	justify-content: center;
 	padding: 8px 16px;
-	background: #eef2f6;
+	background: var(--button-bg);
 	border: none;
 	padding: 8px 10px;
 	border-radius: 8px;
@@ -97,7 +125,7 @@ button.primary {
 
 button.ghost {
 	background: transparent;
-	border: 1px solid #e6e8ee;
+	border: 1px solid var(--border);
 }
 
 input[type="time"],
@@ -107,8 +135,8 @@ input[type="text"],
 textarea {
 	padding: 8px;
 	border-radius: 8px;
-	border: 1px solid #e7e9ee;
-	background: #fff;
+	border: 1px solid var(--border);
+	background: var(--card);
 }
 
 textarea {
@@ -123,7 +151,7 @@ input[type="checkbox"] {
 	-webkit-appearance: none;
 	width: 18px;
 	height: 18px;
-	border: 2px solid #e7e9ee;
+	border: 2px solid var(--border);
 	border-radius: 4px;
 	background: transparent;
 	cursor: pointer;
@@ -158,8 +186,9 @@ header {
 header h1:first-of-type {
 	font-size: 1.24em;
 	font-weight: 800;
-	border-bottom: 1px solid #e5e7eb;
+	border-bottom: 1px solid var(--border);
 	padding-bottom: 10px;
+	margin-bottom: 8px;
 }
 
 .controls {
@@ -215,12 +244,12 @@ header h1:first-of-type {
 
 .time-inputs-row .arrow {
 	font-size: 0.75em;
-	color: #666;
+	color: var(--muted-light);
 }
 
 .hours-summary {
 	font-size: 0.9em;
-	color: #666;
+	color: var(--muted-light);
 	text-align: center;
 }
 
@@ -263,7 +292,7 @@ header h1:first-of-type {
 	gap: inherit;
 	margin-bottom: 6px;
 	padding-bottom: 12px;
-	border-bottom: 1px solid #e5e7eb;
+	border-bottom: 1px solid var(--border);
 }
 
 #dadosBotoes button#clearData {
@@ -271,8 +300,8 @@ header h1:first-of-type {
 	color: white;
 }
 #dadosBotoes button#clearData:hover {
-	background: #f5385a;
-	/* border: 1px solid #dc2626; */
+	background: var(--danger);
+	/* border: 1px solid var(--danger-border); */
 }
 
 /* calendar */
@@ -331,17 +360,18 @@ header h1:first-of-type {
 .days {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
-	gap: 6px;
+	gap: 0.32em;
 }
 
 .day {
 	min-height: 78px;
-	background: #fff;
+	background: var(--card);
 	border-radius: 8px;
 	padding: 8px;
 	border: 1px solid transparent;
 	position: relative;
 	cursor: pointer;
+	aspect-ratio: 1/1;
 }
 
 .day.inactive {
@@ -353,29 +383,29 @@ header h1:first-of-type {
 }
 
 .day.holiday {
-	background: #fef2f2;
-	border-color: #fecaca;
+	background: var(--holiday-bg);
+	border-color: var(--holiday-border);
 }
 
 .day.personal-day-off {
-	background: #fffbeb;
-	border-color: #fde68a;
+	background: var(--personal-bg);
+	border-color: var(--personal-border);
 }
 
 .day.sick-leave {
-	background: #fef3c7;
-	border-color: #fde68a;
+	background: var(--sick-bg);
+	border-color: var(--personal-border);
 }
 
 .day.deficit {
-	background: #fef2f2;
-	border-color: #f87171;
+	background: var(--deficit-bg);
+	border-color: var(--deficit-border);
 	border-width: 2px;
 }
 
 .day.overtime {
-	background: #f0fdf4;
-	border-color: #22c55e;
+	background: var(--overtime-bg);
+	border-color: var(--overtime-border);
 	border-width: 2px;
 }
 
@@ -440,7 +470,7 @@ header h1:first-of-type {
 .modal-backdrop {
 	position: fixed;
 	inset: 0;
-	background: rgba(6, 8, 12, 0.45);
+	background: var(--overlay);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -494,8 +524,8 @@ button.close-btn {
 }
 
 .close-btn:hover {
-	background: rgba(0, 0, 0, 0.05);
-	color: #000;
+	background: var(--hover-overlay);
+	color: var(--text);
 }
 
 .form-grid {
@@ -597,7 +627,7 @@ div#modal div.modal.card div.time-fields-container div label:first-child {
 footer {
 	margin-top: 24px;
 	padding: 16px 0;
-	border-top: 1px solid #e5e7eb;
+	border-top: 1px solid var(--border);
 	font-size: 1em;
 	color: var(--muted);
 	display: flex;
@@ -621,7 +651,12 @@ footer {
 	justify-content: left;
 	align-items: center;
 	width: 100%;
-	margin-top: 6px;
+}
+
+.footer-bottom svg {
+	width: 1.75em;
+	height: 1.75em;
+	fill: currentColor;
 }
 
 /* Theme selector */
@@ -639,7 +674,7 @@ footer {
 .theme-selector select {
 	padding: 6px 8px;
 	border-radius: 6px;
-	border: 1px solid #e5e7eb;
+	border: 1px solid var(--border);
 	background: var(--card);
 	color: inherit;
 	font-size: inherit;
@@ -650,26 +685,58 @@ footer {
 [data-theme="dark"] {
 	--bg: #0f172a;
 	--card: #1e293b;
+	--text: #f1f5f9;
 	--muted: #94a3b8;
+	--muted-light: #cbd5e1;
 	--accent: #60a5fa;
 	--accent-2: #3b82f6;
+
+	/* Borders */
+	--border: #374151;
+
+	/* Buttons */
+	--button-bg: #475569;
+	--button-hover: #64748b;
+
+	/* States */
+	--danger: #f5385a;
+	--danger-border: #dc2626;
+
+	/* Calendar states - Dark */
+	--holiday-bg: #7f1d1d;
+	--holiday-border: #dc2626;
+	--personal-bg: #78350f;
+	--personal-border: #f59e0b;
+	--sick-bg: #78350f;
+	--deficit-bg: #7f1d1d;
+	--deficit-border: #dc2626;
+	--overtime-bg: #14532d;
+	--overtime-border: #16a34a;
+
+	/* Overlays */
+	--overlay: rgba(0, 0, 0, 0.7);
+	--hover-overlay: rgba(255, 255, 255, 0.1);
+
+	/* Inputs */
+	--input-bg: #334155;
+	--input-border: #475569;
 }
 
 [data-theme="dark"] body {
-	color: #f1f5f9;
+	color: var(--text);
 }
 
 [data-theme="dark"] label {
-	color: #f1f5f9;
+	color: var(--text);
 }
 
 [data-theme="dark"] .small {
-	color: #cbd5e1;
+	color: var(--muted-light);
 }
 
 [data-theme="dark"] h2,
 [data-theme="dark"] h3 {
-	color: #f1f5f9;
+	color: var(--text);
 }
 
 [data-theme="dark"] input[type="time"],
@@ -677,13 +744,13 @@ footer {
 [data-theme="dark"] select,
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] textarea {
-	background: #334155;
-	border-color: #475569;
-	color: #f1f5f9;
+	background: var(--input-bg);
+	border-color: var(--input-border);
+	color: var(--text);
 }
 
 [data-theme="dark"] input[type="checkbox"] {
-	border-color: #475569;
+	border-color: var(--input-border);
 }
 
 [data-theme="dark"] input[type="checkbox"]:checked {
@@ -692,46 +759,46 @@ footer {
 }
 
 [data-theme="dark"] button {
-	background: #475569;
-	color: #f1f5f9;
+	background: var(--button-bg);
+	color: var(--text);
 }
 
 [data-theme="dark"] button:hover,
 [data-theme="dark"] .nav-btn:hover {
-	background: #64748b;
+	background: var(--button-hover);
 }
 
 [data-theme="dark"] button.primary {
 	background: var(--accent);
-	color: #f1f5f9;
+	color: var(--text);
 }
 
 [data-theme="dark"] button.ghost {
 	background: transparent;
-	border-color: #475569;
-	color: #f1f5f9;
+	border-color: var(--input-border);
+	color: var(--text);
 }
 
 [data-theme="dark"] button.ghost:hover {
-	background: #475569;
+	background: var(--button-bg);
 }
 
 [data-theme="dark"] .close-btn:hover {
-	background: rgba(255, 255, 255, 0.1);
-	color: #f1f5f9;
+	background: var(--hover-overlay);
+	color: var(--text);
 }
 
 [data-theme="dark"] footer,
 [data-theme="dark"] header h1:first-of-type {
-	border-color: #374151;
+	border-color: var(--border);
 }
 
 [data-theme="dark"] .theme-selector select {
-	border-color: #4b5563;
+	border-color: var(--border);
 }
 
 [data-theme="dark"] #dadosBotoes #exportBtns {
-	border-color: #374151;
+	border-color: var(--border);
 }
 
 [data-theme="dark"] .nav-btn {
@@ -740,50 +807,50 @@ footer {
 }
 
 [data-theme="dark"] .day {
-	background: #334155;
-	color: #f1f5f9;
+	background: var(--input-bg);
+	color: var(--text);
 }
 
 [data-theme="dark"] .day.holiday {
-	background: #7f1d1d;
-	border-color: #dc2626;
+	background: var(--holiday-bg);
+	border-color: var(--holiday-border);
 }
 
 [data-theme="dark"] .day.personal-day-off {
-	background: #78350f;
-	border-color: #f59e0b;
+	background: var(--personal-bg);
+	border-color: var(--personal-border);
 }
 
 [data-theme="dark"] .day.sick-leave {
-	background: #78350f;
-	border-color: #f59e0b;
+	background: var(--sick-bg);
+	border-color: var(--personal-border);
 }
 
 [data-theme="dark"] .day.deficit {
-	background: #7f1d1d;
-	border-color: #dc2626;
+	background: var(--deficit-bg);
+	border-color: var(--deficit-border);
 }
 
 [data-theme="dark"] .day.overtime {
-	background: #14532d;
-	border-color: #16a34a;
+	background: var(--overtime-bg);
+	border-color: var(--overtime-border);
 }
 
 [data-theme="dark"] .totals .line span {
-	color: #cbd5e1;
+	color: var(--muted-light);
 }
 
 [data-theme="dark"] .totals .line strong {
-	color: #f1f5f9;
+	color: var(--text);
 }
 
 [data-theme="dark"] .modal {
 	background: var(--card);
-	color: #f1f5f9;
+	color: var(--text);
 }
 
 [data-theme="dark"] .modal-backdrop {
-	background: rgba(0, 0, 0, 0.7);
+	background: var(--overlay);
 }
 
 @media (max-width: 1024px) {
