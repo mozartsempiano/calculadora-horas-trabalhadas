@@ -18,196 +18,208 @@
 		<link rel="stylesheet" href="assets/css/style.css" />
 	</head>
 	<body>
+		<div class="sidebar-overlay" id="sidebarOverlay"></div>
 		<div class="container">
-			<header>
-				<h1>Calculadora de Horas Trabalhadas</h1>
-				<div class="controls">
-					<div class="card">
-						<div>
-							<div class="standard-hours-wrapper">
-								<label>Horário padrão de trabalho:</label>
-								<div class="time-inputs-row">
-									<input
-										id="standardEntry"
-										type="time"
-										value="08:00"
-										title="Entrada"
-									/>
-									<span class="arrow">→</span>
-									<input
-										id="standardLunchOut"
-										type="time"
-										value="12:00"
-										title="Saída almoço"
-									/>
-									<span class="arrow">→</span>
-									<input
-										id="standardLunchIn"
-										type="time"
-										value="13:00"
-										title="Volta almoço"
-									/>
-									<span class="arrow">→</span>
-									<input
-										id="standardExit"
-										type="time"
-										value="17:45"
-										title="Saída"
-									/>
-								</div>
-								<div class="hours-summary">
-									Horas/dia:
-									<span id="calculatedHours">8h45</span>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="controls-dois">
-						<div class="card">
-							<label for="workSchedule">Escala semanal</label>
-							<select id="workSchedule">
-								<option value="5x2">5x2</option>
-								<option value="6x1">6x1</option>
-								<option value="3x4">3x4</option>
-								<option value="4x3">4x3</option>
-							</select>
-						</div>
-						<div class="card">
-							<label for="cycleStartDay">Dia de início do ciclo</label>
-							<input
-								id="cycleStartDay"
-								type="number"
-								min="1"
-								max="31"
-								value="25"
-								style="width: 60px; margin-top: 4px"
-							/>
-						</div>
-						<div class="card">
-							<label for="rounding">Arredondamento</label>
-							<select
-								id="rounding"
-								style="
-									margin-top: 4px;
-									min-width: 140px;
-									width: fit-content;
-									max-width: 240px;
-								"
-							>
-								<option value="threshold10" selected>
-									Ajuste CLT automático
-								</option>
-								<option value="nearest5">Arredondar para 5 min</option>
-								<option value="nearest10">Arredondar para 10 min</option>
-								<option value="nearest15">Arredondar para 15 min</option>
-								<option value="none">Nenhum</option>
-							</select>
-						</div>
-					</div>
-				</div>
-			</header>
-
-			<main class="calendar">
-				<section class="card month">
-					<div class="month-header">
-						<div class="month-header-nav">
-							<button id="prevMonth" class="nav-btn" aria-label="Mês anterior">
-								<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-									<path
-										d="M13 16l-5-6 5-6"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									/>
-								</svg>
-							</button>
-							<div id="monthLabel"></div>
-							<button id="nextMonth" class="nav-btn" aria-label="Próximo mês">
-								<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-									<path
-										d="M7 4l5 6-5 6"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									/>
-								</svg>
-							</button>
-						</div>
-						<div class="small">
-							Clique em um dia para adicionar/editar horas
-						</div>
-					</div>
-
-					<div class="weekdays">
-						<div>Dom</div>
-						<div>Seg</div>
-						<div>Ter</div>
-						<div>Qua</div>
-						<div>Qui</div>
-						<div>Sex</div>
-						<div>Sáb</div>
-					</div>
-					<div id="days" class="days"></div>
-				</section>
-
-				<aside class="sidebar">
-					<div class="card">
-						<h3>Resumo do período</h3>
-						<div class="totals">
-							<div class="line">
-								<span>Dias úteis (escala)</span
-								><strong id="workDaysTotal">0</strong>
-							</div>
-							<div class="line">
-								<span>Horas previstas (contrato)</span
-								><strong id="expectedTotal">0h00</strong>
-							</div>
-							<div class="line">
-								<span>Horas trabalhadas</span
-								><strong id="workedTotal">0h00</strong>
-							</div>
-							<div class="line">
-								<span>Saldo (sobre/baixo)</span
-								><strong id="balance">0h00</strong>
-							</div>
-							<div class="line">
-								<span>Horas/dia restantes</span
-								><strong id="dailyNeeded">0h00</strong>
-							</div>
-						</div>
-					</div>
-
-					<div class="card">
-						<h3>Legenda</h3>
-						<div class="small">
-							<strong>Ajuste CLT automático:</strong> Diferenças de até 10
-							minutos em relação às horas contratuais (tanto para mais quanto
-							para menos) são ajustadas para o valor contratual. Acima de 10
-							min, conta o tempo real trabalhado.<br /><br />
-							<strong>Escala semanal:</strong> 5x2 = 5 dias trabalho + 2 folga;
-							6x1 = 6 trabalho + 1 folga; etc.<br /><br />
-							<strong>Dia de início do ciclo:</strong> Define quando seu período
-							de trabalho começa/termina (ex: dia 25 = do dia 25 ao dia 24 do
-							próximo mês).
-						</div>
-					</div>
-
-					<div class="card" id="dadosBotoes">
-						<div id="exportBtns">
-							<button id="exportJson" class="export-btn">Exportar</button>
-							<button id="importJson" class="export-btn">Importar</button>
-						</div>
-						<button id="clearData" class="ghost">
-							Limpar dados deste navegador
+			<div class="content">
+				<header>
+					<div class="header-top">
+						<h1>Calculadora de Horas Trabalhadas</h1>
+						<button id="toggleSidebar" aria-label="Abrir menu lateral">
+							☰
 						</button>
-						<input id="fileInput" type="file" accept="application/json" />
 					</div>
-				</aside>
-			</main>
+					<div class="controls">
+						<div class="card">
+							<div>
+								<div class="standard-hours-wrapper">
+									<label>Horário padrão de trabalho:</label>
+									<div class="time-inputs-row">
+										<input
+											id="standardEntry"
+											type="time"
+											value="08:00"
+											title="Entrada"
+										/>
+										<span class="arrow">→</span>
+										<input
+											id="standardLunchOut"
+											type="time"
+											value="12:00"
+											title="Saída almoço"
+										/>
+										<span class="arrow">→</span>
+										<input
+											id="standardLunchIn"
+											type="time"
+											value="13:00"
+											title="Volta almoço"
+										/>
+										<span class="arrow">→</span>
+										<input
+											id="standardExit"
+											type="time"
+											value="17:45"
+											title="Saída"
+										/>
+									</div>
+									<div class="hours-summary">
+										Horas/dia:
+										<span id="calculatedHours">8h45</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="controls-dois">
+							<div class="card">
+								<label for="workSchedule">Escala semanal</label>
+								<select id="workSchedule">
+									<option value="5x2">5x2</option>
+									<option value="6x1">6x1</option>
+									<option value="3x4">3x4</option>
+									<option value="4x3">4x3</option>
+								</select>
+							</div>
+							<div class="card">
+								<label for="cycleStartDay">Dia de início do ciclo</label>
+								<input
+									id="cycleStartDay"
+									type="number"
+									min="1"
+									max="31"
+									value="25"
+									style="width: 60px; margin-top: 4px"
+								/>
+							</div>
+							<div class="card">
+								<label for="rounding">Arredondamento</label>
+								<select
+									id="rounding"
+									style="
+										margin-top: 4px;
+										min-width: 140px;
+										width: fit-content;
+										max-width: 240px;
+									"
+								>
+									<option value="threshold10" selected>
+										Ajuste CLT automático
+									</option>
+									<option value="nearest5">Arredondar para 5 min</option>
+									<option value="nearest10">Arredondar para 10 min</option>
+									<option value="nearest15">Arredondar para 15 min</option>
+									<option value="none">Nenhum</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</header>
+
+				<main class="calendar">
+					<section class="card month">
+						<div class="month-header">
+							<div class="month-header-nav">
+								<button
+									id="prevMonth"
+									class="nav-btn"
+									aria-label="Mês anterior"
+								>
+									<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+										<path
+											d="M13 16l-5-6 5-6"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</button>
+								<div id="monthLabel"></div>
+								<button id="nextMonth" class="nav-btn" aria-label="Próximo mês">
+									<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+										<path
+											d="M7 4l5 6-5 6"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</button>
+							</div>
+							<div id="calendar-small" class="small">
+								Clique em um dia para adicionar/editar horas
+							</div>
+						</div>
+
+						<div class="weekdays">
+							<div>Dom</div>
+							<div>Seg</div>
+							<div>Ter</div>
+							<div>Qua</div>
+							<div>Qui</div>
+							<div>Sex</div>
+							<div>Sáb</div>
+						</div>
+						<div id="days" class="days"></div>
+					</section>
+
+					<aside class="sidebar">
+						<div class="card">
+							<h3>Resumo do período</h3>
+							<div class="totals">
+								<div class="line">
+									<span>Dias úteis (escala)</span
+									><strong id="workDaysTotal">0</strong>
+								</div>
+								<div class="line">
+									<span>Horas previstas (contrato)</span
+									><strong id="expectedTotal">0h00</strong>
+								</div>
+								<div class="line">
+									<span>Horas trabalhadas</span
+									><strong id="workedTotal">0h00</strong>
+								</div>
+								<div class="line">
+									<span>Saldo (sobre/baixo)</span
+									><strong id="balance">0h00</strong>
+								</div>
+								<div class="line">
+									<span>Horas/dia restantes</span
+									><strong id="dailyNeeded">0h00</strong>
+								</div>
+							</div>
+						</div>
+
+						<div class="card">
+							<h3>Legenda</h3>
+							<div class="small">
+								<strong>Ajuste CLT automático:</strong> Diferenças de até 10
+								minutos em relação às horas contratuais (tanto para mais quanto
+								para menos) são ajustadas para o valor contratual. Acima de 10
+								min, conta o tempo real trabalhado.<br /><br />
+								<strong>Escala semanal:</strong> 5x2 = 5 dias trabalho + 2
+								folga; 6x1 = 6 trabalho + 1 folga; etc.<br /><br />
+								<strong>Dia de início do ciclo:</strong> Define quando seu
+								período de trabalho começa/termina (ex: dia 25 = do dia 25 ao
+								dia 24 do próximo mês).
+							</div>
+						</div>
+
+						<div class="card" id="dadosBotoes">
+							<div id="exportBtns">
+								<button id="exportJson" class="export-btn">Exportar</button>
+								<button id="importJson" class="export-btn">Importar</button>
+							</div>
+							<button id="clearData" class="ghost">
+								Limpar dados deste navegador
+							</button>
+							<input id="fileInput" type="file" accept="application/json" />
+						</div>
+					</aside>
+				</main>
+			</div>
 
 			<footer>
 				<div class="footer-top">
@@ -319,7 +331,7 @@
 							<input id="modalIsSickLeave" type="checkbox" /> Atestado médico
 						</label>
 					</div>
-					<div id="sick-leave-time" class="fields-wrapper">
+					<div id="sick-leave-time" class="fields-wrapper hidden">
 						<label>Horas do Atestado (início - fim)</label>
 						<div class="fields-container">
 							<input id="modalSickLeaveStart" type="time" />

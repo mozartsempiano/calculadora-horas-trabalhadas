@@ -123,7 +123,7 @@ function abrirModalPara(iso, objData, inativo) {
 	alternarCamposHorario();
 	alternarCamposAtestado();
 
-	modal.style.display = "flex";
+	modal.classList.add("show");
 }
 
 function alternarCamposHorario() {
@@ -132,7 +132,11 @@ function alternarCamposHorario() {
 	const eFeriado = checkFeriado.checked;
 
 	if (container) {
-		container.style.display = eFolga || eFeriado ? "none" : "";
+		if (eFolga || eFeriado) {
+			container.classList.add("hidden");
+		} else {
+			container.classList.remove("hidden");
+		}
 	}
 }
 
@@ -140,7 +144,12 @@ function alternarCamposAtestado() {
 	const camposAtestado = document.getElementById("sick-leave-time");
 	const checkAtestado = document.getElementById("modalIsSickLeave");
 	const eAtestado = checkAtestado.checked;
-	camposAtestado.style.display = eAtestado ? "" : "none";
+
+	if (eAtestado) {
+		camposAtestado.classList.remove("hidden");
+	} else {
+		camposAtestado.classList.add("hidden");
+	}
 }
 
 function calcularHorasContrato() {
@@ -862,11 +871,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	document.getElementById("cancelModal").addEventListener("click", () => {
-		modal.style.display = "none";
+		modal.classList.remove("show");
 	});
 
 	document.getElementById("closeModal").addEventListener("click", () => {
-		modal.style.display = "none";
+		modal.classList.remove("show");
 	});
 
 	document.getElementById("saveDay").addEventListener("click", () => {
@@ -924,7 +933,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		};
 		if (!estado.dados[chaveEdicaoAtual]) estado.dados[chaveEdicaoAtual] = {};
 		estado.dados[chaveEdicaoAtual][isoEdicaoAtual] = obj;
-		modal.style.display = "none";
+		modal.classList.remove("show");
 		renderizarCalendario();
 	});
 
@@ -935,7 +944,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		) {
 			delete estado.dados[chaveEdicaoAtual][isoEdicaoAtual];
 		}
-		modal.style.display = "none";
+		modal.classList.remove("show");
 		renderizarCalendario();
 	});
 
@@ -1209,4 +1218,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	calcularHorasContrato();
 	renderizarCalendario();
+
+	// Toggle sidebar no mobile
+	const toggleSidebar = document.getElementById("toggleSidebar");
+	const sidebar = document.querySelector(".sidebar");
+	const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+	toggleSidebar.addEventListener("click", () => {
+		sidebar.classList.add("show");
+		sidebarOverlay.classList.add("show");
+	});
+
+	// Fechar sidebar ao clicar fora dela
+	document.addEventListener("click", (e) => {
+		if (
+			sidebar.classList.contains("show") &&
+			!sidebar.contains(e.target) &&
+			!toggleSidebar.contains(e.target)
+		) {
+			sidebar.classList.remove("show");
+			sidebarOverlay.classList.remove("show");
+		}
+	});
 });
