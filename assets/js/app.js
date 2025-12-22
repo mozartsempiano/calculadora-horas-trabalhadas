@@ -1179,15 +1179,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-	document.getElementById("themeSelect").addEventListener("change", (e) => {
-		const temaSelecionado = e.target.value;
-		document.documentElement.setAttribute("data-theme", temaSelecionado);
-		localStorage.setItem("theme", temaSelecionado);
-	});
+	const themeSelect = document.getElementById("themeSelect");
+	if (themeSelect) {
+		themeSelect.addEventListener("change", (e) => {
+			const temaSelecionado = e.target.value;
+			document.documentElement.setAttribute("data-theme", temaSelecionado);
+			localStorage.setItem("theme", temaSelecionado);
+		});
 
-	const temaFavoritado = localStorage.getItem("theme") || "dark";
-	document.documentElement.setAttribute("data-theme", temaFavoritado);
-	document.getElementById("themeSelect").value = temaFavoritado;
+		const temaFavoritado = localStorage.getItem("theme") || "dark";
+		document.documentElement.setAttribute("data-theme", temaFavoritado);
+		themeSelect.value = temaFavoritado;
+	}
 
 	carregarArmazenamento();
 
