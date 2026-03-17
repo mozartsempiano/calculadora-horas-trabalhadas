@@ -1,22 +1,3 @@
-// Retorna o número de dias úteis pagos (escala ou folga, nunca feriado) entre duas datas (inclusive)
-function obterDiasUteisPassados(dataInicio, dataFim) {
-	let dias = 0;
-	let data = new Date(dataInicio);
-	while (data <= dataFim) {
-		const iso = data.toISOString().slice(0, 10);
-		const chave = chaveMes(data);
-		const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
-		const escalaTrabalho = estado.configuracoes.escalaTrabalho;
-		const deveTrabalhar = deveSerDiaUtil(data, escalaTrabalho);
-		const isFolga = registro.isHoliday || registro.isFolga;
-		const isFeriado = registro.isDayOff || registro.isFeriado;
-		if ((deveTrabalhar || isFolga) && !isFeriado) {
-			dias++;
-		}
-		data.setDate(data.getDate() + 1);
-	}
-	return dias;
-}
 const estado = {
 	deslocamentoMes: 0,
 	dados: {},
@@ -39,23 +20,20 @@ function carregarArmazenamento() {
 	if (dados)
 		try {
 			const obj = JSON.parse(dados);
-			estado.dados = obj.data || obj.dados || {};
+			estado.dados = obj.dados || {};
 
-			if (obj.settings) {
-				const config = obj.settings;
+			if (obj.configuracoes) {
+				const config = obj.configuracoes;
 				estado.configuracoes = {
-					horasContrato: config.contractHours || config.horasContrato || "8h45",
-					arredondamento:
-						config.rounding || config.arredondamento || "threshold10",
-					escalaTrabalho: config.workSchedule || config.escalaTrabalho || "5x2",
-					diaInicioCiclo: config.cycleStartDay || config.diaInicioCiclo || 25,
-					entradaPadrao:
-						config.standardEntry || config.entradaPadrao || "08:00",
+					horasContrato: config.horasContrato || "8h45",
+					arredondamento: config.arredondamento || "threshold10",
+					escalaTrabalho: config.escalaTrabalho || "5x2",
+					diaInicioCiclo: config.diaInicioCiclo || 25,
+					entradaPadrao: config.entradaPadrao || "08:00",
 					saidaAlmocoPadrao:
-						config.standardLunchOut || config.saidaAlmocoPadrao || "12:00",
-					voltaAlmocoPadrao:
-						config.standardLunchIn || config.voltaAlmocoPadrao || "13:00",
-					saidaPadrao: config.standardExit || config.saidaPadrao || "17:45",
+						config.saidaAlmocoPadrao || "12:00",
+					voltaAlmocoPadrao: config.voltaAlmocoPadrao || "13:00",
+					saidaPadrao: config.saidaPadrao || "17:45",
 				};
 			}
 		} catch (e) {}
@@ -90,7 +68,7 @@ const checkFeriado = document.getElementById("isDayOff");
 let chaveEdicaoAtual = null;
 let isoEdicaoAtual = null;
 
-function abrirModalPara(iso, objData, inativo) {
+function abrirModalPara(iso, objData) {
 	isoEdicaoAtual = iso;
 	chaveEdicaoAtual = chaveMes(objData);
 	document.getElementById("modalTitle").textContent =
@@ -173,9 +151,6 @@ function calcularHorasContrato() {
 		const horasCalculadas = minutosParaHM(totalMinutos);
 		estado.configuracoes.horasContrato = horasCalculadas;
 		document.getElementById("calculatedHours").textContent = horasCalculadas;
-		console.log(
-			`Horário padrão atualizado: ${estado.configuracoes.entradaPadrao}-${estado.configuracoes.saidaAlmocoPadrao} | ${estado.configuracoes.voltaAlmocoPadrao}-${estado.configuracoes.saidaPadrao} = ${horasCalculadas}`
-		);
 
 		return horasCalculadas;
 	}
@@ -191,7 +166,6 @@ function calcularMinutosTrabalhados(registro, aplicarTolerancia = true) {
 		registro.isFeriado
 	)
 		return 0;
-	// Se houver atestado, descontar apenas o que exceder o intervalo do atestado
 	let atestadoInicio = null,
 		atestadoFim = null;
 	if (
@@ -219,13 +193,11 @@ function calcularMinutosTrabalhados(registro, aplicarTolerancia = true) {
 			let fimAlmoco = voltaAlmoco;
 			let intervalo = fimAlmoco - inicioAlmoco;
 			if (intervalo > 0) {
-				// Se houver atestado, descontar apenas o tempo do almoço que NÃO está coberto pelo atestado
 				if (
 					atestadoInicio !== null &&
 					atestadoFim !== null &&
 					atestadoFim > atestadoInicio
 				) {
-					// Calcula sobreposição do atestado com o intervalo de almoço
 					const sobreposicaoInicio = Math.max(inicioAlmoco, atestadoInicio);
 					const sobreposicaoFim = Math.min(fimAlmoco, atestadoFim);
 					let minutosSobrepostos = 0;
@@ -237,24 +209,8 @@ function calcularMinutosTrabalhados(registro, aplicarTolerancia = true) {
 				trabalhoRegular -= intervalo;
 			}
 		}
-		console.log(
-			`Trabalho: ${registro.in || registro.entrada || "N/A"}-${
-				registro.out || registro.saida || "N/A"
-			} = ${minutosParaHM(trabalhoRegular)} | Tolerância: ${
-				estado.configuracoes.arredondamento
-			}`
-		);
-		if (voltaAlmoco !== null && saidaAlmoco !== null) {
-			console.log(
-				`  Almoço: ${minutosParaHM(saidaAlmoco)}-${minutosParaHM(
-					voltaAlmoco
-				)} descontado`
-			);
-		}
 		totalMinutosTrabalhados += trabalhoRegular;
 	}
-
-	// O cálculo de atestado foi removido daqui, pois não deve ser somado ao total trabalhado
 
 	if (
 		totalMinutosTrabalhados === 0 &&
@@ -267,26 +223,11 @@ function calcularMinutosTrabalhados(registro, aplicarTolerancia = true) {
 	}
 
 	if (aplicarTolerancia && entrada !== null && saida !== null) {
-		let trabalhoRegular = saida - entrada;
-		if (voltaAlmoco !== null && saidaAlmoco !== null) {
-			const intervalo = voltaAlmoco - saidaAlmoco;
-			if (intervalo > 0) trabalhoRegular -= intervalo;
-		}
-		const ajustado = aplicarArredondamento(trabalhoRegular, registro);
-		const ajuste = ajustado - trabalhoRegular;
-		totalMinutosTrabalhados += ajuste;
-		if (ajuste !== 0) {
-			console.log(
-				`  Tolerância aplicada: ${ajuste > 0 ? "+" : ""}${ajuste} min`
-			);
-		}
+		totalMinutosTrabalhados = aplicarArredondamento(
+			totalMinutosTrabalhados,
+			registro
+		);
 	}
-
-	console.log(
-		`RESULTADO: ${minutosParaHM(
-			totalMinutosTrabalhados
-		)} (${totalMinutosTrabalhados} min)`
-	);
 
 	return totalMinutosTrabalhados;
 }
@@ -324,6 +265,13 @@ function obterInfoTolerancia(registro) {
 	};
 }
 
+function deveAplicarToleranciaClt(registro, minutosDia) {
+	if (!registro || minutosDia === null) return false;
+	const minutosContratoDia =
+		hmParaMinutos(estado.configuracoes.horasContrato) || 525;
+	return Math.abs(minutosDia - minutosContratoDia) <= 10;
+}
+
 function aplicarArredondamento(minutos, registro = null) {
 	if (minutos === null) return null;
 	const arred = estado.configuracoes.arredondamento;
@@ -334,9 +282,7 @@ function aplicarArredondamento(minutos, registro = null) {
 	if (arred === "threshold10") {
 		const minutosContratoDia =
 			hmParaMinutos(estado.configuracoes.horasContrato) || 525;
-		const diferenca = minutos - minutosContratoDia;
-
-		if (Math.abs(diferenca) <= 10) {
+		if (deveAplicarToleranciaClt(registro, minutos)) {
 			return minutosContratoDia;
 		} else {
 			return minutos;
@@ -345,67 +291,15 @@ function aplicarArredondamento(minutos, registro = null) {
 	return minutos;
 }
 
-function obterDiasUteisMes(mesVisualizado, escalaTrabalho) {
-	const ano = mesVisualizado.getFullYear();
-	const mes = mesVisualizado.getMonth();
-	const diasNoMes = new Date(ano, mes + 1, 0).getDate();
-
-	if (escalaTrabalho === "custom") {
-		let diasUteis = 0;
-		const chave = chaveMes(mesVisualizado);
-		const dadosMes = estado.dados[chave] || {};
-
-		for (let d = 1; d <= diasNoMes; d++) {
-			const iso = new Date(ano, mes, d).toISOString().slice(0, 10);
-			const registro = dadosMes[iso] || {};
-			if (!registro.isHoliday && !registro.isFolga) {
-				diasUteis++;
-			}
-		}
-		return diasUteis;
-	}
-
-	const [diasTrabalho, diasDescanso] = escalaTrabalho.split("x").map(Number);
-	const diasCiclo = diasTrabalho + diasDescanso;
-
-	let totalDiasUteis = 0;
-	const chave = chaveMes(mesVisualizado);
-	const dadosMes = estado.dados[chave] || {};
-
-	for (let d = 1; d <= diasNoMes; d++) {
-		const iso = new Date(ano, mes, d).toISOString().slice(0, 10);
-		const registro = dadosMes[iso] || {};
-
-		if (registro.isHoliday || registro.isFolga) {
-			continue;
-		}
-
-		const diaAno = Math.floor(
-			(new Date(ano, mes, d) - new Date(ano, 0, 0)) / (24 * 60 * 60 * 1000)
-		);
-		const posicaoCiclo = (diaAno - 1) % diasCiclo;
-
-		if (posicaoCiclo < diasTrabalho) {
-			totalDiasUteis++;
-		}
-	}
-
-	return totalDiasUteis;
-}
-
 function recalcularTotais() {
 	const { dataInicio, dataFim } = obterPeriodoCicloTrabalho();
 
 	let soma = 0;
 	let dataAtual = new Date(dataInicio);
-	let diasTrabalhados = 0; // Total de dias trabalhados
 	const hoje = new Date();
 	hoje.setHours(23, 59, 59, 999);
-	// Definir diasUteisPassados corretamente aqui
-	let diasUteisPassados = obterDiasUteisPassados(dataInicio, hoje); // Dias úteis passados
-
-	const detalhesDiarios = [];
-	let deficitTotal = 0;
+	const limitePeriodo = hoje < dataFim ? hoje : dataFim;
+	const diasUteisPassados = obterDiasUteisPassados(dataInicio, limitePeriodo);
 
 	while (dataAtual <= dataFim && dataAtual <= hoje) {
 		const iso = dataAtual.toISOString().slice(0, 10);
@@ -416,237 +310,38 @@ function recalcularTotais() {
 		const isFolga = registro.isHoliday || registro.isFolga;
 		const isFeriado = registro.isDayOff || registro.isFeriado;
 
-		// Só conta se for dia útil pela escala OU folga (folga precisa ser paga), mas nunca feriado
 		if ((deveTrabalhar || isFolga) && !isFeriado) {
 			const mins = calcularMinutosTrabalhados(registro);
-			const minutosContrato =
-				hmParaMinutos(estado.configuracoes.horasContrato) || 525;
-			const nomeDia = dataAtual.toLocaleDateString("pt-BR", {
-				weekday: "long",
-				day: "2-digit",
-				month: "2-digit",
-				year: "numeric",
-			});
-
 			if (mins !== null) {
 				soma += mins;
-				diasTrabalhados++;
-
-				const diferenca = mins - minutosContrato;
-				if (diferenca < 0) {
-					deficitTotal += Math.abs(diferenca);
-					detalhesDiarios.push({
-						data: iso,
-						nomeDia: nomeDia,
-						trabalhado: minutosParaHM(mins),
-						esperado: minutosParaHM(minutosContrato),
-						deficit: minutosParaHM(Math.abs(diferenca)),
-						tipo: "deficit",
-					});
-				} else if (diferenca > 0) {
-					detalhesDiarios.push({
-						data: iso,
-						nomeDia: nomeDia,
-						trabalhado: minutosParaHM(mins),
-						esperado: minutosParaHM(minutosContrato),
-						excedente: minutosParaHM(diferenca),
-						tipo: "excedente",
-					});
-				}
-			} else {
-				if (deveTrabalhar) {
-					deficitTotal += minutosContrato;
-					detalhesDiarios.push({
-						data: iso,
-						nomeDia: nomeDia,
-						trabalhado: "0h00",
-						esperado: minutosParaHM(minutosContrato),
-						deficit: minutosParaHM(minutosContrato),
-						tipo: "faltante",
-					});
-				}
 			}
 		}
 		dataAtual.setDate(dataAtual.getDate() + 1);
 	}
 
 	const hojeCalculo = new Date();
-	let diasPagos = 0;
-	let dataAux = new Date(dataInicio);
+	hojeCalculo.setHours(23, 59, 59, 999);
+	const marcoRestante =
+		hojeCalculo >= dataInicio
+			? hojeCalculo
+			: new Date(dataInicio.getTime() - 24 * 60 * 60 * 1000);
 	const minutoContratoPorDia =
 		hmParaMinutos(estado.configuracoes.horasContrato) || 0;
-	// Dias pagos = dias úteis pela escala OU folga, nunca feriado
-	while (dataAux <= hojeCalculo) {
-		const iso = dataAux.toISOString().slice(0, 10);
-		const chave = chaveMes(dataAux);
-		const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
-		const escalaTrabalho = estado.configuracoes.escalaTrabalho;
-		const deveTrabalhar = deveSerDiaUtil(dataAux, escalaTrabalho);
-		const isFolga = registro.isHoliday || registro.isFolga;
-		const isFeriado = registro.isDayOff || registro.isFeriado;
-		if ((deveTrabalhar || isFolga) && !isFeriado) {
-			diasPagos++;
-		}
-		dataAux.setDate(dataAux.getDate() + 1);
-	}
-	// Descontar dias com atestado do esperado
-	let diasAtestadoEsperado = 0;
-	dataAux = new Date(dataInicio);
-	while (dataAux <= hojeCalculo) {
-		const iso = dataAux.toISOString().slice(0, 10);
-		const chave = chaveMes(dataAux);
-		const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
-		if (
-			(registro.isSickLeave || registro.isAtestado) &&
-			(registro.sickLeaveStart || registro.inicioAtestado) &&
-			(registro.sickLeaveEnd || registro.fimAtestado)
-		) {
-			diasAtestadoEsperado++;
-		}
-		dataAux.setDate(dataAux.getDate() + 1);
-	}
-	const esperadoCorrigido =
-		(diasPagos - diasAtestadoEsperado) * minutoContratoPorDia;
-	totalDiasUteisEl.textContent = diasUteisPassados; // Atualizar o resumo do período com os valores realmente usados no cálculo
-	const diasUteisRestantes = obterDiasUteisRestantes(hojeCalculo, dataFim);
-	// Removido: saldo duplicado
+	totalDiasUteisEl.textContent = diasUteisPassados;
+	const diasUteisRestantes = obterDiasUteisRestantes(marcoRestante, dataFim);
 	let necessarioDiario = 0;
-
-	// Corrigir cálculo: folgas não compensadas devem ser consideradas como débito
-	// Contar quantas folgas (dias marcados como isFolga) existem até hoje
-	let dataAuxFolga = new Date(dataInicio);
-	let folgasNaoCompensadas = 0;
-	while (dataAuxFolga <= hoje) {
-		const iso = dataAuxFolga.toISOString().slice(0, 10);
-		const chave = chaveMes(dataAuxFolga);
-		const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
-		if (registro.isHoliday || registro.isFolga) {
-			folgasNaoCompensadas++;
-		}
-		dataAuxFolga.setDate(dataAuxFolga.getDate() + 1);
-	}
-	// O esperado deve ser: (diasUteisPassados) * minutoContratoPorDia
-	// O saldo deve ser: soma - esperado
 	const esperado = diasUteisPassados * minutoContratoPorDia;
 	const saldo = soma - esperado;
-	console.log(
-		`[PERÍODO] ${dataInicio.toLocaleDateString(
-			"pt-BR"
-		)} a ${dataFim.toLocaleDateString("pt-BR")}`
-	);
-	console.log(
-		`  Dias úteis: ${
-			diasUteisPassados + diasUteisRestantes
-		} | Trabalhados: ${diasTrabalhados} | Esperado: ${minutosParaHM(
-			esperado
-		)} | Real: ${minutosParaHM(soma)} | Saldo: ${minutosParaHM(saldo)}`
-	);
-
-	console.log(`[ANÁLISE POR DIA]`);
-	let dataLog = new Date(dataInicio);
-	while (dataLog <= dataFim && dataLog <= hoje) {
-		const isoLog = dataLog.toISOString().slice(0, 10);
-		const chaveLog = chaveMes(dataLog);
-		const registroLog =
-			(estado.dados[chaveLog] && estado.dados[chaveLog][isoLog]) || {};
-		const nomeDia = dataLog.toLocaleDateString("pt-BR", {
-			weekday: "short",
-			day: "2-digit",
-			month: "2-digit",
-		});
-
-		if (registroLog.isHoliday || registroLog.isFolga) {
-			console.log(
-				`  ${nomeDia}: ${
-					registroLog.isDayOff || registroLog.isFeriado ? "FERIADO" : "FOLGA"
-				}`
-			);
-		} else if (deveSerDiaUtil(dataLog, estado.configuracoes.escalaTrabalho)) {
-			const minsLog = calcularMinutosTrabalhados(registroLog);
-			const minutosContrato =
-				hmParaMinutos(estado.configuracoes.horasContrato) || 525;
-
-			if (minsLog !== null) {
-				const diff = minsLog - minutosContrato;
-				let status = "";
-				if (diff > 0) status = ` | EXTRA: ${minutosParaHM(diff)}`;
-				else if (diff < 0)
-					status = ` | DÉFICIT: ${minutosParaHM(Math.abs(diff))}`;
-
-				const horarios =
-					(registroLog.in || registroLog.entrada) &&
-					(registroLog.out || registroLog.saida)
-						? `${registroLog.in || registroLog.entrada}-${
-								registroLog.out || registroLog.saida
-						  }`
-						: "Horários incompletos";
-
-				console.log(
-					`  ${nomeDia}: ${horarios} = ${minutosParaHM(minsLog)}${status}`
-				);
-
-				if (
-					(registroLog.isSickLeave || registroLog.isAtestado) &&
-					(registroLog.sickLeaveStart || registroLog.inicioAtestado) &&
-					(registroLog.sickLeaveEnd || registroLog.fimAtestado)
-				) {
-					console.log(
-						`    Atestado: ${
-							registroLog.sickLeaveStart || registroLog.inicioAtestado
-						}-${registroLog.sickLeaveEnd || registroLog.fimAtestado}`
-					);
-				}
-				if (registroLog.note || registroLog.observacao) {
-					console.log(`    Obs: ${registroLog.note || registroLog.observacao}`);
-				}
-			} else {
-				console.log(
-					`  ${nomeDia}: NÃO TRABALHADO | FALTA: ${minutosParaHM(
-						minutosContrato
-					)}`
-				);
-			}
-		}
-
-		dataLog.setDate(dataLog.getDate() + 1);
-	}
-
-	let diasAtestado = 0;
-	dataAtual = new Date(dataInicio);
-	while (dataAtual <= dataFim) {
-		const iso = dataAtual.toISOString().slice(0, 10);
-		const chave = chaveMes(dataAtual);
-		const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
-		if (registro.isSickLeave || registro.isAtestado) diasAtestado++;
-		dataAtual.setDate(dataAtual.getDate() + 1);
-	}
-
-	if (diasAtestado > 0) {
-		console.log(
-			`[ATESTADOS] ${diasAtestado} dias com atestado médico no período`
-		);
-	}
-
-	console.log(`[RESUMO FINAL]`);
-	console.log(
-		`  Escala: ${estado.configuracoes.escalaTrabalho} | Horas/dia: ${estado.configuracoes.horasContrato} | Tolerância: ${estado.configuracoes.arredondamento}`
-	);
-	console.log(
-		`  Trabalhados: ${diasTrabalhados}/${diasUteisPassados} dias | Restantes: ${diasUteisRestantes} dias`
-	);
-	console.log(`  Folgas não compensadas: ${folgasNaoCompensadas}`);
-	console.log(
-		`  Saldo atual: ${minutosParaHM(saldo)} ${
-			saldo >= 0 ? "(crédito)" : "(débito)"
-		}`
-	);
 
 	if (diasUteisRestantes > 0) {
 		let folgasCompensarFuturas = 0;
-		let dataFutura = new Date();
+		let dataFutura =
+			hojeCalculo >= dataInicio
+				? new Date(hojeCalculo)
+				: new Date(dataInicio.getTime() - 24 * 60 * 60 * 1000);
 		dataFutura.setDate(dataFutura.getDate() + 1);
 
-		while (dataFutura <= obterPeriodoCicloTrabalho().dataFim) {
+		while (dataFutura <= dataFim) {
 			const iso = dataFutura.toISOString().slice(0, 10);
 			const chave = chaveMes(dataFutura);
 			const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
@@ -667,33 +362,8 @@ function recalcularTotais() {
 		const horasRestantesContrato =
 			horasRestantesRegulares + horasCompensacao - saldoAtual;
 		necessarioDiario = horasRestantesContrato / diasUteisRestantes;
-
-		if (saldo < 0) {
-			console.log("Atrasado:", {
-				horasRestantesRegulares: horasRestantesRegulares,
-				folgasCompensarFuturas: folgasCompensarFuturas,
-				horasCompensacao: horasCompensacao,
-				saldoAtual: saldoAtual,
-				horasRestantesContrato: horasRestantesContrato,
-				diasUteisRestantes: diasUteisRestantes,
-				necessarioDiario: necessarioDiario,
-				necessarioDiarioHM: minutosParaHM(Math.round(necessarioDiario)),
-			});
-		} else {
-			console.log("No prazo ou adiantado:", {
-				horasRestantesRegulares: horasRestantesRegulares,
-				folgasCompensarFuturas: folgasCompensarFuturas,
-				horasCompensacao: horasCompensacao,
-				saldoAtual: saldoAtual,
-				horasRestantesContrato: horasRestantesContrato,
-				diasUteisRestantes: diasUteisRestantes,
-				necessarioDiario: necessarioDiario,
-				necessarioDiarioHM: minutosParaHM(Math.round(necessarioDiario)),
-			});
-		}
 	}
 
-	// Atualizar o resumo do período com os valores realmente usados no cálculo
 	totalEsperadoEl.textContent = minutosParaHM(esperado);
 	totalTrabalhadoEl.textContent = minutosParaHM(soma);
 	saldoEl.textContent = minutosParaHM(saldo);
@@ -734,22 +404,12 @@ function obterDiasUteisRestantes(deData, dataFim) {
 
 	dataAtual.setDate(dataAtual.getDate() + 1);
 
-	console.log("Dias úteis restantes:", {
-		deData: deData.toISOString().slice(0, 10),
-		dataFim: dataFim.toISOString().slice(0, 10),
-		iniciandoDe: dataAtual.toISOString().slice(0, 10),
-		escalaTrabalho: escalaTrabalho,
-	});
-
-	let folgasEncontradas = 0;
-
 	while (dataAtual <= dataFim) {
 		const iso = dataAtual.toISOString().slice(0, 10);
 		const chave = chaveMes(dataAtual);
 		const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
 
 		if (registro.isDayOff || registro.isFeriado) {
-			console.log("Pulando feriado:", iso);
 			dataAtual.setDate(dataAtual.getDate() + 1);
 			continue;
 		}
@@ -759,94 +419,23 @@ function obterDiasUteisRestantes(deData, dataFim) {
 			registro.isSickLeave ||
 			registro.isAtestado
 		) {
-			console.log("Pulando dia já trabalhado/atestado:", iso);
 			dataAtual.setDate(dataAtual.getDate() + 1);
 			continue;
 		}
 
 		if (escalaTrabalho === "custom") {
 			diasRestantes++;
-			console.log("Dia escala personalizada:", iso);
 		} else {
 			const deveTrabalhar = deveSerDiaUtil(dataAtual, escalaTrabalho);
 
-			console.log("Verificação escala:", {
-				data: iso,
-				diaSemana: dataAtual.getDay(),
-				nomeDia: dataAtual.toLocaleDateString("pt-BR", { weekday: "short" }),
-				escalaTrabalho: escalaTrabalho,
-				deveTrabalhar: deveTrabalhar,
-				eFolga: !!(registro.isHoliday || registro.isFolga),
-			});
-
 			if (deveTrabalhar && !registro.isHoliday && !registro.isFolga) {
 				diasRestantes++;
-			} else if (!deveTrabalhar && (registro.isHoliday || registro.isFolga)) {
-				folgasEncontradas++;
-				console.log("Folga em fim de semana - sem impacto:", iso);
-			} else if (deveTrabalhar && (registro.isHoliday || registro.isFolga)) {
-				folgasEncontradas++;
-				console.log("Folga em dia útil - REDUZ dias disponíveis:", iso);
 			}
 		}
 
 		dataAtual.setDate(dataAtual.getDate() + 1);
 	}
-
-	console.log("Total dias úteis restantes:", diasRestantes);
-	console.log(
-		"Folgas encontradas que precisam compensação:",
-		folgasEncontradas
-	);
 	return diasRestantes;
-}
-
-function obterDiasUteisCiclo() {
-	const { dataInicio, dataFim } = obterPeriodoCicloTrabalho();
-	const escalaTrabalho = estado.configuracoes.escalaTrabalho;
-
-	if (escalaTrabalho === "custom") {
-		let diasUteis = 0;
-		let dataAtual = new Date(dataInicio);
-
-		while (dataAtual <= dataFim) {
-			const iso = dataAtual.toISOString().slice(0, 10);
-			const chave = chaveMes(dataAtual);
-			const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
-			if (!registro.isDayOff && !registro.isFeriado) {
-				diasUteis++;
-			}
-			dataAtual.setDate(dataAtual.getDate() + 1);
-		}
-		return diasUteis;
-	}
-
-	const [diasTrabalho, diasDescanso] = escalaTrabalho.split("x").map(Number);
-	const diasCiclo = diasTrabalho + diasDescanso;
-
-	let totalDiasUteis = 0;
-	let dataAtual = new Date(dataInicio);
-
-	while (dataAtual <= dataFim) {
-		const iso = dataAtual.toISOString().slice(0, 10);
-		const chave = chaveMes(dataAtual);
-		const registro = (estado.dados[chave] && estado.dados[chave][iso]) || {};
-
-		if (registro.isDayOff || registro.isFeriado) {
-			dataAtual.setDate(dataAtual.getDate() + 1);
-			continue;
-		}
-
-		const deveTrabalhar = deveSerDiaUtil(dataAtual, escalaTrabalho);
-
-		if (deveTrabalhar) {
-			totalDiasUteis++;
-		}
-
-		dataAtual.setDate(dataAtual.getDate() + 1);
-	}
-
-	return totalDiasUteis;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -884,7 +473,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		const inicioAtestado = document.getElementById("modalSickLeaveStart").value;
 		const fimAtestado = document.getElementById("modalSickLeaveEnd").value;
 
-		// Obter valores dos campos
 		let entrada =
 			checkFolga.checked || checkFeriado.checked
 				? null
@@ -902,7 +490,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				? null
 				: horarioSaida.value || null;
 
-		// Se algum campo de horário foi preenchido, preencher os outros com padrão se estiverem vazios
 		if (!(checkFolga.checked || checkFeriado.checked)) {
 			const entradaPadrao = estado.configuracoes.entradaPadrao || "08:00";
 			const saidaAlmocoPadrao =
@@ -1036,9 +623,8 @@ document.addEventListener("DOMContentLoaded", () => {
 					throw new Error("O arquivo não contém um objeto JSON válido.");
 				}
 
-				// Aceita tanto dados/settings quanto dados/configuracoes
-				let dadosImportados = obj.dados || obj.data;
-				let configImportada = obj.configuracoes || obj.settings;
+				let dadosImportados = obj.dados;
+				let configImportada = obj.configuracoes;
 
 				if (!dadosImportados && !configImportada) {
 					throw new Error(
@@ -1047,23 +633,19 @@ document.addEventListener("DOMContentLoaded", () => {
 				}
 
 				if (dadosImportados) {
-					// Converte todos os registros para o padrão em português
 					const traduzirRegistro = (reg) => {
 						if (!reg) return reg;
-						// Pega os horários padrão atuais
 						const padrao = estado.configuracoes || {};
 						const entradaPadrao = padrao.entradaPadrao || "08:00";
 						const saidaAlmocoPadrao = padrao.saidaAlmocoPadrao || "12:00";
 						const voltaAlmocoPadrao = padrao.voltaAlmocoPadrao || "13:00";
 						const saidaPadrao = padrao.saidaPadrao || "17:45";
 
-						// Pega valores do registro ou do padrão
 						let entrada = reg.entrada ?? reg.in ?? "";
 						let saidaAlmoco = reg.saidaAlmoco ?? reg.outLunch ?? "";
 						let voltaAlmoco = reg.voltaAlmoco ?? reg.inLunch ?? "";
 						let saida = reg.saida ?? reg.out ?? "";
 
-						// Se algum horário está preenchido, preenche os outros com padrão
 						const algumPreenchido =
 							entrada || saidaAlmoco || voltaAlmoco || saida;
 						if (algumPreenchido) {
@@ -1096,26 +678,19 @@ document.addEventListener("DOMContentLoaded", () => {
 						}
 					}
 					estado.dados = dadosConvertidos;
-					console.log(
-						"Dados de horas importados:",
-						Object.keys(estado.dados).length,
-						"meses"
-					);
 				}
 
 				if (configImportada) {
 					const c = configImportada;
 					estado.configuracoes = {
-						horasContrato: c.horasContrato || c.contractHours || "8h45",
-						arredondamento: c.arredondamento || c.rounding || "threshold10",
-						escalaTrabalho: c.escalaTrabalho || c.workSchedule || "5x2",
-						diaInicioCiclo: c.diaInicioCiclo || c.cycleStartDay || 25,
-						entradaPadrao: c.entradaPadrao || c.standardEntry || "08:00",
-						saidaAlmocoPadrao:
-							c.saidaAlmocoPadrao || c.standardLunchOut || "12:00",
-						voltaAlmocoPadrao:
-							c.voltaAlmocoPadrao || c.standardLunchIn || "13:00",
-						saidaPadrao: c.saidaPadrao || c.standardExit || "17:45",
+						horasContrato: c.horasContrato || "8h45",
+						arredondamento: c.arredondamento || "threshold10",
+						escalaTrabalho: c.escalaTrabalho || "5x2",
+						diaInicioCiclo: c.diaInicioCiclo || 25,
+						entradaPadrao: c.entradaPadrao || "08:00",
+						saidaAlmocoPadrao: c.saidaAlmocoPadrao || "12:00",
+						voltaAlmocoPadrao: c.voltaAlmocoPadrao || "13:00",
+						saidaPadrao: c.saidaPadrao || "17:45",
 					};
 
 					document.getElementById("rounding").value =
@@ -1155,16 +730,14 @@ document.addEventListener("DOMContentLoaded", () => {
 						document.getElementById("standardExit").value;
 
 					calcularHorasContrato();
-					console.log("Configurações importadas:", estado.configuracoes);
 				}
 
 				salvarArmazenamento();
 				renderizarCalendario();
 				alert("Dados importados com sucesso!");
 			} catch (e) {
-				console.error("Erro ao importar JSON:", e);
 				alert(
-					`Erro ao importar arquivo: ${e.message}\n\nO arquivo deve ter as propriedades "dados" e/ou "configuracoes" ou "data" e/ou "settings".`
+					`Erro ao importar arquivo: ${e.message}\n\nO arquivo deve ter as propriedades "dados" e/ou "configuracoes".`
 				);
 			}
 		};
@@ -1178,19 +751,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			renderizarCalendario();
 		}
 	});
-
-	const themeSelect = document.getElementById("themeSelect");
-	if (themeSelect) {
-		themeSelect.addEventListener("change", (e) => {
-			const temaSelecionado = e.target.value;
-			document.documentElement.setAttribute("data-theme", temaSelecionado);
-			localStorage.setItem("theme", temaSelecionado);
-		});
-
-		const temaFavoritado = localStorage.getItem("theme") || "dark";
-		document.documentElement.setAttribute("data-theme", temaFavoritado);
-		themeSelect.value = temaFavoritado;
-	}
 
 	carregarArmazenamento();
 
@@ -1222,7 +782,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	calcularHorasContrato();
 	renderizarCalendario();
 
-	// Toggle sidebar no mobile
 	const toggleSidebar = document.getElementById("toggleSidebar");
 	const sidebar = document.querySelector(".sidebar");
 	const sidebarOverlay = document.getElementById("sidebarOverlay");
@@ -1232,7 +791,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		sidebarOverlay.classList.add("show");
 	});
 
-	// Fechar sidebar ao clicar fora dela
 	document.addEventListener("click", (e) => {
 		if (
 			sidebar.classList.contains("show") &&

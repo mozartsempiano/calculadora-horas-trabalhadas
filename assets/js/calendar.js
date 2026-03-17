@@ -80,46 +80,25 @@ function renderizarCalendario() {
 		rotuloMes.textContent = `${diaInicioCiclo} ${mesInicio} - ${dataFim.getDate()} ${mesFim}`;
 	}
 
-	const primeiro = obterMesVisualizado();
-	const ano = primeiro.getFullYear();
-	const mes = primeiro.getMonth();
-
-	const diaInicio = new Date(ano, mes, 1);
-	const indiceInicio = diaInicio.getDay();
-	const ultimoDiaAnterior = new Date(ano, mes, 0).getDate();
-	const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+	const indiceInicio = dataInicio.getDay();
+	const totalDiasCiclo =
+		Math.floor((dataFim - dataInicio) / (24 * 60 * 60 * 1000)) + 1;
 
 	containerDias.innerHTML = "";
-	const totalCelulas = Math.ceil((indiceInicio + diasNoMes) / 7) * 7;
-	let contadorDia = 1;
-	let contadorProximoMes = 1;
+	const totalCelulas = Math.ceil((indiceInicio + totalDiasCiclo) / 7) * 7;
 
 	for (let i = 0; i < totalCelulas; i++) {
 		const celula = document.createElement("div");
 		celula.className = "day card";
-		let dataCelula = null;
-		let inativo = false;
-
-		if (i < indiceInicio) {
-			const d = ultimoDiaAnterior - (indiceInicio - 1 - i);
-			const dataAnterior = new Date(ano, mes - 1, d);
-			dataCelula = dataAnterior;
-			inativo = true;
+		const deslocamento = i - indiceInicio;
+		if (deslocamento < 0 || deslocamento >= totalDiasCiclo) {
 			celula.classList.add("inactive");
-		} else if (contadorDia <= diasNoMes) {
-			dataCelula = new Date(ano, mes, contadorDia);
-			contadorDia++;
-		} else {
-			const proximo = new Date(ano, mes + 1, contadorProximoMes++);
-			dataCelula = proximo;
-			inativo = true;
-			celula.classList.add("inactive");
-		}
-
-		const estaNoCiclo = dataCelula >= dataInicio && dataCelula <= dataFim;
-		if (!estaNoCiclo && diaInicioCiclo !== 1) {
 			celula.classList.add("out-of-cycle");
+			containerDias.appendChild(celula);
+			continue;
 		}
+		const dataCelula = new Date(dataInicio);
+		dataCelula.setDate(dataInicio.getDate() + deslocamento);
 
 		const iso = dataCelula.toISOString().slice(0, 10);
 		const num = document.createElement("div");
@@ -187,7 +166,7 @@ function renderizarCalendario() {
 				}
 
 				const hoje = new Date();
-				if (dataCelula < hoje && !inativo) {
+				if (dataCelula < hoje) {
 					const minutosContrato =
 						hmParaMinutos(estado.configuracoes.horasContrato) || 525;
 					const deveTrabalhar = deveSerDiaUtil(
@@ -232,9 +211,7 @@ function renderizarCalendario() {
 		}
 		celula.appendChild(resumo);
 
-		celula.addEventListener("click", () =>
-			abrirModalPara(iso, dataCelula, inativo)
-		);
+		celula.addEventListener("click", () => abrirModalPara(iso, dataCelula));
 		containerDias.appendChild(celula);
 	}
 

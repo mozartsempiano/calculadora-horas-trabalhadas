@@ -966,21 +966,6 @@ footer svg {
 	align-self: center;
 }
 
-.theme-selector label {
-	font-size: inherit;
-	color: var(--muted);
-}
-
-.theme-selector select {
-	padding: 6px 8px;
-	border-radius: 6px;
-	border: 1px solid var(--border);
-	background: var(--card);
-	color: inherit;
-	font-size: inherit;
-	cursor: pointer;
-}
-
 button:hover,
 .nav-btn:hover {
 	background: var(--button-hover);
@@ -1184,10 +1169,6 @@ button:hover,
 
 	.footer-bottom {
 		justify-content: center;
-	}
-
-	.theme-selector select {
-		padding: 3px 6px;
 	}
 
 	.standard-hours-wrapper {
